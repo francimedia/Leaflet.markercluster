@@ -38,13 +38,32 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		chunkProgress: null, // progress callback: function(processed, total, elapsed) (e.g. for a progress indicator)
 
 		//Options to pass to the L.Polygon constructor
-		polygonOptions: {}
+		polygonOptions: {},
+
+		// Use Photos instead of markers
+		enablePhotoClusterMode: false, 
+		
+		photoZoomWidth: 300, 
+		
+		photoGalleryWidth: 500, 
+
+		photoIconCreateFunction: null,
+
+		extractPhotoUrl: null
+
 	},
 
 	initialize: function (options) {
 		L.Util.setOptions(this, options);
 		if (!this.options.iconCreateFunction) {
 			this.options.iconCreateFunction = this._defaultIconCreateFunction;
+		}
+
+		if (this.options.enablePhotoClusterMode) {
+			this.options.iconCreateFunction = this.options.photoIconCreateFunction ? this.options.photoIconCreateFunction : this._defaultPhotoIconCreateFunction;
+			this.options.singleMarkerMode = true;
+			this.options.spiderfyOnMaxZoom = false;
+			this.options.extractPhotoUrl = this._extractPhotoUrl;
 		}
 
 		this._featureGroup = L.featureGroup();
@@ -626,11 +645,45 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
 	},
 
+	_extractPhotoUrl: function(marker) {
+        if( typeof marker.feature != 'undefined' && typeof marker.feature.properties.photo_url != 'undefined' ) {
+        	return marker.feature.properties.photo_url;
+        } 
+        if( typeof marker.options != 'undefined' && typeof marker.options.photo_url != 'undefined' ) {
+        	return marker.options.photo_url;
+        } 		
+        return "http://placehold.it/50x50";
+	},
+
+	_defaultPhotoIconCreateFunction: function (cluster) {
+
+	    var childCount = cluster.getChildCount();
+
+	    var childMarkers = cluster.getAllChildMarkers();
+
+	    var photos_html = "";
+
+	    for (index = 0; index < childCount && index < 3; ++index) {
+	        var style = childCount == 1 ? Math.floor((Math.random() * 10) + 1) : index;
+	        photos_html += '<span class="photo-cluster-' + style + '"><img src="' + this.extractPhotoUrl(childMarkers[index]) + '" /></span>';
+	    }
+
+	    var html = '<span class="photo-cluster photo-cluster-count-' + childCount + '">' + photos_html + '<strong>' + childCount + '</strong></span>';
+
+	    var divIcon = new L.DivIcon({
+	        html: html
+	    });
+
+	    return divIcon;
+
+	},
+
 	_bindEvents: function () {
 		var map = this._map,
 		    spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
 		    showCoverageOnHover = this.options.showCoverageOnHover,
-		    zoomToBoundsOnClick = this.options.zoomToBoundsOnClick;
+		    zoomToBoundsOnClick = this.options.zoomToBoundsOnClick,
+		    enablePhotoClusterMode = this.options.enablePhotoClusterMode;
 
 		//Zoom on cluster click or spiderfy if we are at the lowest level
 		if (spiderfyOnMaxZoom || zoomToBoundsOnClick) {
@@ -643,6 +696,29 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this.on('clustermouseout', this._hideCoverage, this);
 			map.on('zoomend', this._hideCoverage, this);
 		}
+
+		if(enablePhotoClusterMode) {
+			this.on('click', this._photoPopup, this);
+			this.on('clusterclick', this._photoGallery, this);
+		}
+	},
+			
+	_photoGallery: function (e) {
+	    var map = this._map;
+	    if (map.getMaxZoom() === map.getZoom()) {
+	        e.layer.photoGallery();
+	    }
+	},
+
+	_photoPopup: function (e) {
+	    var map = this._map;
+	    
+	    var html = '<span class="photo-cluster-zoom"><img src="' + this._extractPhotoUrl(e.layer) + '" /></span>';
+
+	    var popup = new L.popup({
+	        autoPan: true,
+	        minWidth: this.options.photoZoomWidth
+	    }).setContent(html).setLatLng(e.latlng).openOn(this._map);
 	},
 
 	_zoomOrSpiderfy: function (e) {
@@ -1725,6 +1801,29 @@ L.MarkerCluster.include({
 
 	_circleSpiralSwitchover: 9, //show spiral instead of circle from this marker count upwards.
 								// 0 -> always spiral; Infinity -> always circle
+
+	photoGallery: function () {
+
+	    var childMarkers = this.getAllChildMarkers(),
+	        group = this._group,
+	        map = group._map;
+
+	    var photos_html = "";
+	    for (index = 0; index < childMarkers.length; ++index) {
+	        photos_html += '<li><img src="' + this._group._extractPhotoUrl(childMarkers[index]) + '" /></li>';
+	    }
+
+	    var html = '<div class="photo-cluster-gallery"><ul>' + photos_html + '</ul>';
+
+	    var popup = new L.popup({
+	        offset: new L.Point(40, 150),
+	        // closeButton: false,
+	        autoPan: true,
+	        // autoPanPaddingTopLeft: L.point(150, 150),
+	        minWidth: this.options.photoGalleryWidth,
+	    }).setContent(html).setLatLng(this._latlng).openOn(map);
+
+	},
 
 	spiderfy: function () {
 		if (this._group._spiderfied === this || this._group._inZoomAnimation) {

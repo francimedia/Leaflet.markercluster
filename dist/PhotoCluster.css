@@ -1,0 +1,115 @@
+
+div.leaflet-div-icon, div.leaflet-marker-icon {
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.photo-cluster-gallery ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.photo-cluster-zoom img, .photo-cluster img {
+ 	width: 100%;
+}
+
+.photo-cluster {
+	position: relative;
+    display: block;
+    width: 75px;
+    background: transparent;
+}
+
+.photo-cluster span { 
+	background: #fff;
+	padding: 3px;
+	padding-bottom: 6px;
+	display: inline-block; 
+	position: absolute;
+	top: 0;
+	left: 0;
+	-webkit-transition: -webkit-transform .15s linear;
+	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,.25);
+	-moz-box-shadow: 0 3px 6px rgba(0,0,0,.25); 
+}
+
+.photo-cluster strong {
+	position: absolute;
+	z-index: 9999;
+	right: -10px;
+	top: -5px;
+	background: #777;
+	color: #fff;
+	padding: 3px;
+	display: block;
+	padding-left: 6px;
+	padding-right: 6px;
+	border-radius: 4px;
+	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,.5);
+	-moz-box-shadow: 0 3px 6px rgba(0,0,0,.5);
+}
+
+.photo-cluster-count-1 strong {
+	display: none !important;
+}
+
+.photo-cluster-0 {
+  -webkit-transform: rotate(-5deg);
+  -moz-transform: rotate(-5deg);
+}
+
+.photo-cluster-1 {
+  -webkit-transform: rotate(8deg);
+  -moz-transform: rotate(8deg);
+  margin-left: -3px;
+  margin-top: -2px;
+}
+
+.photo-cluster-2 {
+  -webkit-transform: rotate(3deg);
+  -moz-transform: rotate(3deg);
+  margin-left: 3px;
+  margin-top: -2px;
+}
+
+.photo-cluster-3 {
+  -webkit-transform: rotate(-7deg);
+  -moz-transform: rotate(-7deg);
+}
+
+.photo-cluster-4 {
+  -webkit-transform: rotate(-1deg);
+  -moz-transform: rotate(-1deg);
+}
+
+.photo-cluster-5 {
+  -webkit-transform: rotate(-5deg);
+  -moz-transform: rotate(-5deg);
+}
+
+.photo-cluster-6 {
+  -webkit-transform: rotate(-3deg);
+  -moz-transform: rotate(-3deg);
+}
+
+.photo-cluster-7 {
+  -webkit-transform: rotate(2deg);
+  -moz-transform: rotate(2deg);
+}
+
+.photo-cluster-8 {
+  -webkit-transform: rotate(4deg);
+  -moz-transform: rotate(4deg);
+}
+ 
+.photo-cluster-9 {
+  -webkit-transform: rotate(6deg);
+  -moz-transform: rotate(6deg);
+}
+ 
+
+.photo-cluster-10 {
+  -webkit-transform: rotate(1deg);
+  -moz-transform: rotate(1deg);
+}
